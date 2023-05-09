@@ -1,18 +1,22 @@
 import {
   MediaRenderer,
   ThirdwebNftMedia,
+  useActiveListings,
+  useCancelDirectListing,
+  useCancelListing,
   useContract,
   useContractEvents,
+  useContractRead,
   useValidDirectListings,
   useValidEnglishAuctions,
   Web3Button,
 } from "@thirdweb-dev/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "../../../components/Container/Container";
 import { GetStaticProps, GetStaticPaths } from "next";
-import { NFT, ThirdwebSDK } from "@thirdweb-dev/sdk";
+import { ListingType, MarketplaceV3, NFT, ThirdwebSDK, Transaction } from "@thirdweb-dev/sdk";
 import {
-  ETHERSCAN_URL,
+  POLYGONSCAN_URL,
   MARKETPLACE_ADDRESS,
   NETWORK,
   NFT_COLLECTION_ADDRESS,
@@ -23,6 +27,12 @@ import randomColor from "../../../util/randomColor";
 import Skeleton from "../../../components/Skeleton/Skeleton";
 import toast, { Toaster } from "react-hot-toast";
 import toastStyle from "../../../util/toastConfig";
+import { id } from "ethers/lib/utils";
+import { BigNumberish, ethers, } from "ethers";
+import router from "next/router";
+import listings from "../../listings";
+
+
 
 type Props = {
   nft: NFT;
@@ -39,7 +49,9 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
     MARKETPLACE_ADDRESS,
     "marketplace-v3"
   );
+  
 
+  
   // Connect to NFT Collection smart contract
   const { contract: nftCollection } = useContract(NFT_COLLECTION_ADDRESS);
 
@@ -48,6 +60,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
       tokenContract: NFT_COLLECTION_ADDRESS,
       tokenId: nft.metadata.id,
     });
+    
 
   // 2. Load if the NFT is for auction
   const { data: auctionListing, isLoading: loadingAuction } =
@@ -113,6 +126,46 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
     }
     return txResult;
   }
+
+  
+
+  async function getAllValidListings() {
+    // Implementa qui la logica per ottenere tutti i listing validi
+    // ad esempio, chiamate API, accesso al database, ecc.
+  
+    // Esempio di dati di listing mock
+    const listings = [
+      { id: 1, title: 'Listing 1' },
+      { id: 2, title: 'Listing 2' },
+      { id: 3, title: 'Listing 3' },
+    ];
+  
+    return listings;
+  }
+  const Listings = () => {
+   
+    const [loadingListings, setLoadingListings] = useState(true);
+    const [listings, setListings] = useState<{ id: number; title: string; }[]>([]);
+
+    useEffect(() => {
+      const fetchListings = async () => {
+        try {
+          const data = await getAllValidListings();
+          setListings(data);
+          setLoadingListings(false);
+        } catch (error) {
+          console.error('Failed to fetch listings:', error);
+        }
+      };
+  
+      fetchListings();
+    }, []);
+  
+    if (loadingListings) {
+      return <div>Loading listings...</div>;
+    }
+  }
+
 
   return (
     <>
@@ -183,7 +236,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
                     <div className={styles.eventContainer}>
                       <Link
                         className={styles.txHashArrow}
-                        href={`${ETHERSCAN_URL}/tx/${event.transaction.transactionHash}`}
+                        href={`${POLYGONSCAN_URL}/tx/${event.transaction.transactionHash}`}
                         target="_blank"
                       >
                         ↗
@@ -345,14 +398,32 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
                 >
                   Place bid
                 </Web3Button>
+
+               /
+
+               <Link
+                        className={styles.txHashArrow}
+                        href="/cancelListing"
+                        target="_blank"
+                      >
+                        <p className={styles.label}>Cancel listing</p>
+                      </Link>
+         
+            
+          
+             
+         
               </>
             )}
+
+
+   
           </div>
         </div>
       </Container>
     </>
   );
-}
+};
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const tokenId = context.params?.tokenId as string;
@@ -361,7 +432,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   const contract = await sdk.getContract(NFT_COLLECTION_ADDRESS);
 
-  const nft = await contract.erc721.get(tokenId);
+  const nft = await contract.erc1155.get(tokenId);
 
   let contractMetadata;
 
@@ -383,7 +454,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   const contract = await sdk.getContract(NFT_COLLECTION_ADDRESS);
 
-  const nfts = await contract.erc721.getAll();
+  const nfts = await contract.erc1155.getAll();
 
   const paths = nfts.map((nft) => {
     return {
@@ -399,3 +470,4 @@ export const getStaticPaths: GetStaticPaths = async () => {
     fallback: "blocking", // can also be true or 'blocking'
   };
 };
+

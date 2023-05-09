@@ -27,7 +27,9 @@ const [randomColor1, randomColor2, randomColor3, randomColor4] = [
 export default function ProfilePage() {
   const router = useRouter();
   const [tab, setTab] = useState<"nfts" | "listings" | "auctions">("nfts");
-
+  const [listingId, setListingId] = useState("");
+  
+  
   const { contract: nftCollection } = useContract(NFT_COLLECTION_ADDRESS);
 
   const { contract: marketplace } = useContract(
@@ -49,7 +51,7 @@ export default function ProfilePage() {
     useValidEnglishAuctions(marketplace, {
       seller: router.query.address as string,
     });
-
+    
   return (
     <Container maxWidth="lg">
       <div className={styles.profileHeader}>
@@ -112,21 +114,31 @@ export default function ProfilePage() {
         />
       </div>
 
-      <div
-        className={`${
-          tab === "listings" ? styles.activeTabContent : styles.tabContent
-        }`}
-      >
-        {loadingDirects ? (
-          <p>Loading...</p>
-        ) : directListings && directListings.length === 0 ? (
-          <p>Nothing for sale yet! Head to the sell tab to list an NFT.</p>
-        ) : (
-          directListings?.map((listing) => (
-            <ListingWrapper listing={listing} key={listing.id} />
-          ))
-        )}
+      <div className={`${tab === "listings" ? styles.activeTabContent : styles.tabContent}`}>
+  {loadingDirects ? (
+    <p>Loading...</p>
+  ) : directListings && directListings.length === 0 ? (
+    <p>Nothing for sale yet! Head to the sell tab to list an NFT.</p>
+  ) : (
+   
+    
+      directListings?.map((listing) => (
+    
+
+      
+        <div key={listing.id}>
+        <ListingWrapper listing={listing} />
+        <div>
+          <p>Listing ID: {listing.id}</p>
+        </div>
       </div>
+    ))
+    
+  )}
+  
+
+</div>
+
 
       <div
         className={`${
@@ -139,10 +151,13 @@ export default function ProfilePage() {
           <p>Nothing for sale yet! Head to the sell tab to list an NFT.</p>
         ) : (
           auctionListings?.map((listing) => (
-            <ListingWrapper listing={listing} key={listing.id} />
+            <ListingWrapper listing={listing} key={listing.id}  />
+            
           ))
         )}
+        
       </div>
+      
     </Container>
   );
 }

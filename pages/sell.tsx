@@ -64,12 +64,16 @@ export default function Sell() {
             <p className={tokenPageStyles.collectionName}>
               Token ID #{selectedNft.metadata.id}
             </p>
+       
 
             <div className={tokenPageStyles.pricingContainer}>
               <SaleInfo nft={selectedNft} />
+              AT THE MOMENT POLYWATCH LISTING HAVE THE PRORITY. NOTICE ALSO THAT IS NOT POSSIBLE TO CANCEL LISTING AT THE MOMENT
             </div>
           </div>
+          
         </div>
+         
       )}
     </Container>
   );

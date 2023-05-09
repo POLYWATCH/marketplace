@@ -70,6 +70,7 @@
   background-color: rgba(255, 255, 255, 0.8) !important;
 }
 
+
 .collectionImage {
   width: 32px !important;
   height: 32px !important;
@@ -285,6 +286,8 @@
     max-width: 100%;
     top: 0px;
   }
+
+  
 
   .metadataContainer {
     margin-top: 32px;
