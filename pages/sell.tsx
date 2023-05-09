@@ -68,7 +68,7 @@ export default function Sell() {
 
             <div className={tokenPageStyles.pricingContainer}>
               <SaleInfo nft={selectedNft} />
-              AT THE MOMENT POLYWATCH LISTING HAVE THE PRORITY. NOTICE ALSO THAT IS NOT POSSIBLE TO CANCEL LISTING AT THE MOMENT
+              AT THE MOMENT POLYWATCH LISTING HAVE PRIORITY. 
             </div>
           </div>
           
